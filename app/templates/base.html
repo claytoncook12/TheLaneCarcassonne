@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>The Lane Carcassonne</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="static/css/half-slider.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <div>
+	  <div class="navbar fixed-top" style="height: 60px; width: 100%; background-color: #3b519b;"></div>
+	</div>
+
+    <nav class="navbar bg-light navbar-light navbar-expand-lg fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="/">The Carcassonne Lane</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="/">Home
+                <span class="sr-only">(current)</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/Games">Games</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/Rivalries">Rivalries</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/About">About</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <header class="spacer" style="height: 20px; width: 100%;"></header>
+
+    <!-- Header Content -->
+	{% block header %}{% endblock %}
+
+    <!-- Page Content -->
+   	{% block page_content %}{% endblock %}
+
+
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <p class="m-0 text-center" style="color: #3b519b;">Created by <a href="https://github.com/claytoncook12">CSCoding</a> - 2018</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="static/vendor/jquery/jquery.min.js"></script>
+    <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  </body>
+
+</html>

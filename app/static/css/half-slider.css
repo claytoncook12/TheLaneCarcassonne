@@ -1,0 +1,37 @@
+/*!
+ * Start Bootstrap - Half Slider (https://startbootstrap.com/template-overviews/half-slider)
+ * Copyright 2013-2017 Start Bootstrap
+ * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-half-slider/blob/master/LICENSE)
+ */
+
+.carousel-item {
+  height: 65vh;
+  min-height: 300px;
+  background: no-repeat center center scroll;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+
+/*!
+ *Added Styles to css CSC
+*/
+
+.navbar-brand {
+  color: #3b519b !important;
+}
+
+.nav-link {
+  color: #3b519b !important;
+}
+
+a:hover {
+	color: #5e83ff !important;
+}
+
+.carousel-caption {
+	color: #3b519b;
+	background-color: rgb(255,255,255,0.25);
+}
