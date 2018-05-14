@@ -6,6 +6,7 @@ app = Flask(__name__)
 app.config['TESTING'] = True
 app.config['SECRET_KEY'] = 'hard to guess string' # Need to use environment variable
 bootstrap = Bootstrap(app)
+app.testing = True
 
 @app.route('/')
 def index():
