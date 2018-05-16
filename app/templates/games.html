@@ -1,13 +1,22 @@
 {% extends "base.html" %}
+{% import "_macros.html" as macros %}
 
 {% block header %}{% endblock %}
-
 
 {% block page_content %}
 <section class="py-5">
 <div class="container">
-  <h1>Find You Games</h1>
-  <p>Use the search form below to display game data.</p>
+	<h1>Find You Games</h1>
+	<p>Use the search form below to display game data.</p>
+
+{% include '_posts.html' %}
+{% if pagination %}
+	<div class="d-flex justify-content-center">
+	    {{ macros.pagination_widget(pagination, 'games') }}
+	</div>
+{% endif %}
+
 </div>
+
 </section>
 {% endblock %}

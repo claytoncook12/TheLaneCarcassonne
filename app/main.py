@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request
 from flask_bootstrap import Bootstrap
 import os
 from datetime import datetime
@@ -49,16 +49,23 @@ class Outcome(db.Model):
     
     def __repr__(self):
         return '<Outcome %r>' % self.outcome
-
 # End Database Setup
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/Games')
+@app.route('/Games', methods=['GET','POST'])
 def games():
-    return render_template('games.html')
+
+    page = request.args.get('page',1, type=int)
+    pagination = db.session.query(Outcome,Player, Game).outerjoin(
+        Player, Outcome.player_id == Player.id).outerjoin(
+            Game, Outcome.games_id == Game.id).paginate(1,20,True)
+    results = pagination.items
+    
+    return render_template('games.html', results=results,
+                           pagination=pagination)
 
 @app.route('/Rivalries')
 def rivalries():
