@@ -9,9 +9,30 @@
 		<p>Use the search form below to display game data.</p>
 
 		
-		{% for result in pagination.items %}
-		    <li class="result">{{ result.Player.name}}</li>
-		{% endfor %}
+		<table class="table">
+			<thead>
+				<tr>
+					<th scope="col">Name</th>
+					<th scope="col">Date</th>
+					<th scope="col">Game Number</th>
+					<th scope="col">Outcome</th>
+					<th scope="col">Points</th>
+					<th scope="col"># Players</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for result in pagination.items %}
+		    	<tr>
+		    		<th scope="row">{{ result.Player.name}}</th>
+		    		<td>{{ result.Game.date}}</td>
+		    		<td>{{ result.Game.number}}</td>
+		    		<td>{{ result.Outcome.outcome}}</td>
+		    		<td>{{ result.Outcome.pts}}</td>
+		    		<td>{{ result.Game.num_players}}</td>
+		    	</tr>
+				{% endfor %}
+			</tbody>
+		</table>
 
 		<ul class="pagination justify-content-center">
 		{% for page in pagination.iter_pages() %}
