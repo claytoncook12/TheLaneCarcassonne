@@ -55,17 +55,14 @@ class Outcome(db.Model):
 def index():
     return render_template('index.html')
 
-@app.route('/Games', methods=['GET','POST'])
-def games():
-
-    page = request.args.get('page',1, type=int)
+@app.route('/Games/<int:page_num>')
+def games(page_num):
     pagination = db.session.query(Outcome,Player, Game).outerjoin(
         Player, Outcome.player_id == Player.id).outerjoin(
-            Game, Outcome.games_id == Game.id).paginate(1,20,True)
-    results = pagination.items
+            Game, Outcome.games_id == Game.id).paginate(
+                page=page_num,per_page=20,error_out=True)
     
-    return render_template('games.html', results=results,
-                           pagination=pagination)
+    return render_template('games.html', pagination=pagination)
 
 @app.route('/Rivalries')
 def rivalries():

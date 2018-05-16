@@ -1,22 +1,32 @@
 {% extends "base.html" %}
-{% import "_macros.html" as macros %}
 
 {% block header %}{% endblock %}
 
 {% block page_content %}
 <section class="py-5">
-<div class="container">
-	<h1>Find You Games</h1>
-	<p>Use the search form below to display game data.</p>
+	<div class="container">
+		<h1>Find You Games</h1>
+		<p>Use the search form below to display game data.</p>
 
-{% include '_posts.html' %}
-{% if pagination %}
-	<div class="d-flex justify-content-center">
-	    {{ macros.pagination_widget(pagination, 'games') }}
+		
+		{% for result in pagination.items %}
+		    <li class="result">{{ result.Player.name}}</li>
+		{% endfor %}
+
+		<ul class="pagination justify-content-center">
+		{% for page in pagination.iter_pages() %}
+			{% if page %}
+				<li class="page_item">
+					<a class="page-link" href="{{ url_for('games', page_num=page) }}">{{ page }}</a>
+				</li>
+			{% else %}
+				<li class="page_item">
+					<a class="page-link">...</a>
+				</li>
+			{% endif %}
+		{% endfor %}
+		</ul>
+
 	</div>
-{% endif %}
-
-</div>
-
 </section>
 {% endblock %}

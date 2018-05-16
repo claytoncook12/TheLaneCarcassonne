@@ -11,10 +11,10 @@
     <title>Carcassonne Lane</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="static/css/half-slider.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/half-slider.css') }}" rel="stylesheet">
 
   </head>
 
@@ -39,7 +39,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/Games">Games</a>
+              <a class="nav-link" href="/Games/1">Games</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/Rivalries">Rivalries</a>
@@ -71,8 +71,8 @@
     </footer>
 
     <!-- Bootstrap core JavaScript -->
-    <script src="static/vendor/jquery/jquery.min.js"></script>
-    <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
   </body>
 
