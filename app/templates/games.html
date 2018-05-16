@@ -5,10 +5,22 @@
 {% block page_content %}
 <section class="py-5">
 	<div class="container">
-		<h1>Find You Games</h1>
-		<p>Use the search form below to display game data.</p>
+		<h1>Games Played</h1>
 
-		
+		<ul class="pagination justify-content-center">
+		{% for page in pagination.iter_pages(left_edge=1,left_current=2,right_current=2,right_edge=1) %}
+			{% if page %}
+				<li class="page_item">
+					<a class="page-link" href="{{ url_for('games', page_num=page) }}">{{ page }}</a>
+				</li>
+			{% else %}
+				<li class="page_item">
+					<a class="page-link">...</a>
+				</li>
+			{% endif %}
+		{% endfor %}
+		</ul>
+
 		<table class="table">
 			<thead>
 				<tr>
@@ -35,7 +47,7 @@
 		</table>
 
 		<ul class="pagination justify-content-center">
-		{% for page in pagination.iter_pages() %}
+		{% for page in pagination.iter_pages(left_edge=1,left_current=2,right_current=2,right_edge=1) %}
 			{% if page %}
 				<li class="page_item">
 					<a class="page-link" href="{{ url_for('games', page_num=page) }}">{{ page }}</a>

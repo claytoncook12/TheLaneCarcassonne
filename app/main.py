@@ -60,7 +60,7 @@ def games(page_num):
     pagination = db.session.query(Outcome,Player, Game).outerjoin(
         Player, Outcome.player_id == Player.id).outerjoin(
             Game, Outcome.games_id == Game.id).paginate(
-                page=page_num,per_page=20,error_out=True)
+                page=page_num,per_page=20,error_out=False)
     
     return render_template('games.html', pagination=pagination)
 
