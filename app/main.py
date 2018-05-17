@@ -1,8 +1,12 @@
-from flask import Flask, render_template, url_for, request
+from flask import Flask, render_template, url_for, request, flash
 from flask_bootstrap import Bootstrap
 import os
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import Form
+from wtforms import StringField, SubmitField,IntegerField, DateTimeField
+from wtforms.validators import Required
+from wtforms.fields.html5 import DateTimeField
 
 app = Flask(__name__)
 app.config['TESTING'] = True
@@ -51,6 +55,17 @@ class Outcome(db.Model):
         return '<Outcome %r>' % self.outcome
 # End Database Setup
 
+# Forms Setup
+class PlayerForm(Form):
+    name = StringField('Player Name: ',validators=[Required()])
+    submit = SubmitField('Submit')
+
+class GameForm(Form):
+    date = DateTimeField('Game was played (Format Year-Month-Day Hour:Minute)', format='%Y-%m-%d %H:%M',validators=[Required()])
+    num_players = IntegerField('Number of players (must be integer): ',validators=[Required()])
+    submit = SubmitField('Submit')
+# End Forms Setup
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -74,6 +89,28 @@ def rivalries():
 @app.route('/About')
 def about():
     return render_template('about.html')
+
+@app.route('/Input/Player', methods=['GET', 'POST'])
+def inputPlayer():
+    form = PlayerForm()
+
+    if form.validate_on_submit():
+        flash('Form was valid on submit')
+        
+    return render_template('inputPlayer.html', form=form)
+
+@app.route('/Input/Game', methods=['GET', 'POST'])
+def inputGame():
+    form = GameForm()
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            flash('Form was valid on submit')
+
+        else:
+            flash('Error when submitting data. Check Formating of inputs.')
+        
+    return render_template('inputGame.html', form=form)
 
 ##     Error Handling Text When Ready
 ##@app.errorhandler(404)

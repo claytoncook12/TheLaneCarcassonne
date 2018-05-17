@@ -42,7 +42,7 @@
               <a class="nav-link" href="/Games/1">Games</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/Games/1">Input</a>
+              <a class="nav-link" href="/Input">Input</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/Rivalries">Rivalries</a>
@@ -55,7 +55,21 @@
       </div>
     </nav>
 
-    <header class="spacer" style="height: 20px; width: 100%;"></header>
+    <header class="spacer" style="height: 60px; width: 100%;"></header>
+
+    <!-- Messages -->
+    {% with messages = get_flashed_messages() %}
+  		{% if messages %}
+    		<div class="container">
+	    		<div class="alert alert-warning alert-dismissible" role='alert'>
+	    		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	    		{% for message in messages %}
+	      			{{ message }}
+	    		{% endfor %}
+	    		</div>
+    		</div>
+  		{% endif %}
+	{% endwith %}
 
     <!-- Header Content -->
 	{% block header %}{% endblock %}
