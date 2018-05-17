@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block header %}
+
+{% endblock %}
+
+{% block page_content %}
+  <section class="py-5">
+    <div class="container">
+      	<h2>Input Player/Game Outcome</h2>
+      		<P>If you can not select the correct player or game you will need to add it.<br>
+      		<button type="button" class="btn btn-outline-secondary"><a href="{{ url_for('inputPlayer')}}">Input New Player</a></button>
+      		<button type="button" class="btn btn-outline-secondary"><a href="{{ url_for('inputGame')}}">Input New Game</a></button>
+      		</p>
+
+      		{{wtf.quick_form(form)}}
+    </div>
+  </section>
+{% endblock %}

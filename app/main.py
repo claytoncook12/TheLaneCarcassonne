@@ -3,10 +3,10 @@ from flask_bootstrap import Bootstrap
 import os
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
-from flask_wtf import Form
-from wtforms import StringField, SubmitField,IntegerField, DateTimeField
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField,IntegerField, DateTimeField, SelectField
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.validators import Required
-from wtforms.fields.html5 import DateTimeField
 
 app = Flask(__name__)
 app.config['TESTING'] = True
@@ -29,7 +29,7 @@ class Player(db.Model):
     outcomes = db.relationship("Outcome", backref='player')
 
     def __repr__(self):
-        return '<Player %r>' % self.name
+        return '{}'.format(self.name)
 
 class Game(db.Model):
     __tablename__ = 'games'
@@ -41,7 +41,7 @@ class Game(db.Model):
     outcomes = db.relationship("Outcome", backref='game')
 
     def __repr__(self):
-        return '<Game %r>' % self.number
+        return 'Game {} on {}'.format(self.number, self.date)
     
 class Outcome(db.Model):
     __tablename__ = 'outcomes'
@@ -56,12 +56,27 @@ class Outcome(db.Model):
 # End Database Setup
 
 # Forms Setup
-class PlayerForm(Form):
-    name = StringField('Player Name: ',validators=[Required()])
+def player_query():
+    return Player.query.order_by(Player.name)
+
+def game_query():
+    return Game.query.order_by(Game.date.desc())
+
+class OutcomeForm(FlaskForm):
+    player_list = QuerySelectField('Name of Player:',query_factory=player_query, allow_blank=True)
+    game_list = QuerySelectField('Game:',query_factory=game_query, allow_blank=True)
+    outcome_input = SelectField('Outcome for Player', choices=[(
+        'Win', 'Win'), ('Lose', 'Lose'), ('Tie', 'Tie')], validators=[Required()])
+    pts_input = IntegerField('Points for Player',validators=[Required()])
     submit = SubmitField('Submit')
 
-class GameForm(Form):
-    date = DateTimeField('Game was played (Format Year-Month-Day Hour:Minute)', format='%Y-%m-%d %H:%M',validators=[Required()])
+class PlayerForm(FlaskForm):
+    name = StringField('Player Name:',validators=[Required()])
+    submit = SubmitField('Submit')
+
+class GameForm(FlaskForm):
+    date = DateTimeField('Game was played (Format Year-Month-Day Hour:Minute)', format='%Y-%m-%d %H:%M',
+                         validators=[Required()])
     num_players = IntegerField('Number of players (must be integer): ',validators=[Required()])
     submit = SubmitField('Submit')
 # End Forms Setup
@@ -89,6 +104,13 @@ def rivalries():
 @app.route('/About')
 def about():
     return render_template('about.html')
+
+
+@app.route('/Input', methods=['GET', 'POST'])
+def input():
+    form = OutcomeForm()
+
+    return render_template('input.html', form=form)
 
 @app.route('/Input/Player', methods=['GET', 'POST'])
 def inputPlayer():
