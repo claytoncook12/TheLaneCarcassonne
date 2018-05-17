@@ -33,7 +33,7 @@
 			</thead>
 			<tbody>
 				{% for result in pagination.items %}
-		    	<tr {% if result.Outcome.outcome == "Win" %}bgcolor="#bfcdff"{% endif %}>
+		    	<tr {% if result.Outcome.outcome == "Win" %}bgcolor="#d1dbff"{% endif %}>
 		    		<td scope="row">{{ result.Player.name}}</th>
 		    		<td>{{ result.Game.date.strftime('%Y/%m/%d')}}</td>
 		    		<td>{{ result.Game.number}}</td>
