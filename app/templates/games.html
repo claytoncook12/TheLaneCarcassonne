@@ -29,18 +29,16 @@
 					<th scope="col">Game Number</th>
 					<th scope="col">Outcome</th>
 					<th scope="col">Points</th>
-					<th scope="col"># Players</th>
 				</tr>
 			</thead>
 			<tbody>
 				{% for result in pagination.items %}
-		    	<tr>
-		    		<th scope="row">{{ result.Player.name}}</th>
+		    	<tr {% if result.Outcome.outcome == "Win" %}bgcolor="#bfcdff"{% endif %}>
+		    		<td scope="row">{{ result.Player.name}}</th>
 		    		<td>{{ result.Game.date.strftime('%Y/%m/%d')}}</td>
 		    		<td>{{ result.Game.number}}</td>
 		    		<td>{{ result.Outcome.outcome}}</td>
 		    		<td>{{ result.Outcome.pts}}</td>
-		    		<td>{{ result.Game.num_players}}</td>
 		    	</tr>
 				{% endfor %}
 			</tbody>
