@@ -36,7 +36,7 @@
 				{% for result in pagination.items %}
 		    	<tr>
 		    		<th scope="row">{{ result.Player.name}}</th>
-		    		<td>{{ result.Game.date}}</td>
+		    		<td>{{ result.Game.date.strftime('%Y/%m/%d')}}</td>
 		    		<td>{{ result.Game.number}}</td>
 		    		<td>{{ result.Outcome.outcome}}</td>
 		    		<td>{{ result.Outcome.pts}}</td>
