@@ -2,6 +2,7 @@ from flask import Flask, render_template, url_for, request, flash, redirect
 from flask_bootstrap import Bootstrap
 import os
 from datetime import datetime
+import re
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField,IntegerField, DateTimeField, SelectField
@@ -63,8 +64,8 @@ def game_query():
     return Game.query.order_by(Game.date.desc())
 
 class OutcomeForm(FlaskForm):
-    player_list = QuerySelectField('Name of Player:',query_factory=player_query, allow_blank=True)
-    game_list = QuerySelectField('Game:',query_factory=game_query, allow_blank=True)
+    player_list = QuerySelectField('Name of Player:',query_factory=player_query, allow_blank=False)
+    game_list = QuerySelectField('Game:',query_factory=game_query, allow_blank=False)
     outcome_input = SelectField('Outcome for Player', choices=[(
         'Win', 'Win'), ('Lose', 'Lose'), ('Tie', 'Tie')], validators=[Required()])
     pts_input = IntegerField('Points for Player',validators=[Required()])
@@ -109,6 +110,28 @@ def about():
 @app.route('/Input', methods=['GET', 'POST'])
 def input():
     form = OutcomeForm()
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            name = form.player_list.data
+            game = form.game_list.data
+            outcome = form.outcome_input.data
+            pts = form.pts_input.data
+
+            form.player_list.data,form.game_list.data,form.outcome_input.data,form.pts_input.data = '','','',''
+
+            # Find Player and Game in Database
+            findPlayer = Player.query.filter_by(name=name.name).first()
+            findGame = Game.query.filter_by(number=game.number).first()
+
+            # Add to Database
+            findOutcome = Outcome.query.filter_by(player=findPlayer,game=findGame).first()
+            if findOutcome == None:
+                addOutcome = Outcome(outcome=outcome,pts=pts,player=findPlayer, game=findGame)
+                db.session.add(addOutcome)
+                flash('AddedPlayer/Game outcome to database')
+            else:
+                flash('Player/Game outcome already in database')
 
     return render_template('input.html', form=form)
 
