@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, flash
+from flask import Flask, render_template, url_for, request, flash, redirect
 from flask_bootstrap import Bootstrap
 import os
 from datetime import datetime
@@ -114,11 +114,25 @@ def input():
 
 @app.route('/Input/Player', methods=['GET', 'POST'])
 def inputPlayer():
+    name = None
     form = PlayerForm()
+    
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            name = form.name.data
+            form.name.data = ''
 
-    if form.validate_on_submit():
-        flash('Form was valid on submit')
-        
+            if db.session.query(Player).filter_by(name=name).all():
+                flash('Name {} in database. Did not add the name to database.'.format(name))
+                return redirect(url_for('inputPlayer'))
+
+            else:
+                # Add name to database
+                addPlayer = Player(name=name)
+                db.session.add(addPlayer)
+                flash('Added player {}.'.format(name))
+                return redirect(url_for('input'))
+
     return render_template('inputPlayer.html', form=form)
 
 @app.route('/Input/Game', methods=['GET', 'POST'])
@@ -127,10 +141,25 @@ def inputGame():
 
     if request.method == 'POST':
         if form.validate_on_submit():
-            flash('Form was valid on submit')
+            date = form.date.data
+            num_players = form.num_players.data
+
+            form.date.data,form.num_players.data = '',''
+
+            if db.session.query(Game).filter_by(date=date,num_players=num_players).all():
+                flash('Game already in database')
+            else:
+                # Add new game to database
+                addGame = Game(number=db.session.query(Game).count()+1, \
+                               date=date, \
+                               game_type='Carcassonne', \
+                               num_players=num_players)
+                db.session.add(addGame)
+                flash('Added game on {}.'.format(date.strftime('%Y-%m-%d %H:%M')))
+                return redirect(url_for('input'))
 
         else:
-            flash('Error when submitting data. Check Formating of inputs.')
+            flash('Error when submitting data. Check formating of inputs.')
         
     return render_template('inputGame.html', form=form)
 
