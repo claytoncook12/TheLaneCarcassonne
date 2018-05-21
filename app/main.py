@@ -8,6 +8,9 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField,IntegerField, DateTimeField, SelectField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.validators import Required
+from sqlalchemy import func
+from sqlalchemy.sql import label
+import pandas as pd
 
 app = Flask(__name__)
 app.config['TESTING'] = True
@@ -82,6 +85,67 @@ class GameForm(FlaskForm):
     submit = SubmitField('Submit')
 # End Forms Setup
 
+# Functions
+def ACAllGames():
+    """All Games That Clayton Cook and Amanda Cook played in"""
+    gReturnAll = db.session.query(Outcome.outcome,Outcome.pts,Player.name,Game.number,Game.date,Game.num_players).outerjoin(
+            Player, Outcome.player_id == Player.id).outerjoin(
+                Game, Outcome.games_id == Game.id).filter((Player.name == "Clayton Cook") | (Player.name == "Amanda Cook"))
+
+    d = {}
+
+    for game in gReturnAll:
+            key = game[3]
+            if key not in d:
+                    d[key] = []
+            d[key].append(game)
+
+    for k,v in list(d.items()):
+        if len(v) != 2:
+            del d[k]        
+
+    # Create List of Filtered Data
+    outcomeAll = []
+    for k in d.keys():
+        outcomeAll.append([d[k][0][0],d[k][0][1],d[k][0][2],d[k][0][3],d[k][0][4],d[k][0][5]])
+        outcomeAll.append([d[k][1][0],d[k][1][1],d[k][1][2],d[k][1][3],d[k][1][4],d[k][1][5]])
+
+    outcomeAll.insert(0,['Outcome', 'Points', 'Name', 'Game Number', 'Date', 'Number of Players'])
+
+    return outcomeAll
+
+def AC1V1():
+    """All Games that Clayton Cook and Amanda Cook played 1v1 in"""
+    # Returns only games where players where playing
+    gReturnOnly = db.session.query(Outcome.outcome,Outcome.pts,Player.name,Game.number,Game.date,Game.num_players).outerjoin(
+            Player, Outcome.player_id == Player.id).outerjoin(
+                Game, Outcome.games_id == Game.id).filter(
+                    (Player.name == "Clayton Cook") | (Player.name == "Amanda Cook")).filter(
+                        Game.num_players == 2)
+
+    d = {}
+
+    for game in gReturnOnly:
+            key = game[3]
+            if key not in d:
+                    d[key] = []
+            d[key].append(game)
+
+    for k,v in list(d.items()):
+        if len(v) != 2:
+            del d[k]        
+    # Create List of Filtered Data
+    outcomeOnly = []
+    for k in d.keys():
+        outcomeOnly.append([d[k][0][0],d[k][0][1],d[k][0][2],d[k][0][3],d[k][0][4],d[k][0][5]])
+        outcomeOnly.append([d[k][1][0],d[k][1][1],d[k][1][2],d[k][1][3],d[k][1][4],d[k][1][5]])
+
+    outcomeOnly.insert(0,['Outcome', 'Points', 'Name', 'Game Number', 'Date', 'Number of Players'])
+
+    return outcomeOnly
+
+# Functions End
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -100,7 +164,29 @@ def games(page_num):
 
 @app.route('/Rivalries')
 def rivalries():
-    return render_template('rivalries.html')
+    
+    # Return list of games between Clayton and Amanda 1v1
+    totalCAGames = AC1V1()
+    totalCAGames = pd.DataFrame(totalCAGames[1:], columns=totalCAGames[0])
+    totalCAGames = totalCAGames.sort_values(['Game Number','Outcome'],ascending=[False, False])
+
+    # Return list of games that included both Clayton and Amanda
+    totalCAAll = ACAllGames()
+    totalCAAll = pd.DataFrame(totalCAAll[1:], columns=totalCAAll[0])
+    totalCAAll = totalCAAll.sort_values(['Game Number','Outcome'],ascending=[False, False])
+    
+    # Stats on Found Games 1v1
+    totalCAGamesCount = len(totalCAGames['Game Number'].unique())
+    totalClaytonWin = len(totalCAGames[(totalCAGames['Outcome'] == 'Win') & (totalCAGames['Name'] == 'Clayton Cook')])
+    totalAmandaWin = len(totalCAGames[(totalCAGames['Outcome'] == 'Win') & (totalCAGames['Name'] == 'Amanda Cook')])
+    ties = len(totalCAGames[(totalCAGames['Outcome'] == 'Tie') & (totalCAGames['Name'] == 'Amanda Cook')])
+    stats1v1 = [totalCAGamesCount, totalClaytonWin, totalAmandaWin, ties]
+    
+    # Convert results to readable list
+    totalCAGames = totalCAGames.values.tolist()
+    results = totalCAGames
+    
+    return render_template('rivalries.html', results=results, stats1v1=stats1v1)
 
 @app.route('/About')
 def about():
