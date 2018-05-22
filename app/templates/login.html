@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block header %}{% endblock %}
+
+{% block page_content %}
+<section class="py-5">
+	<div class="container">
+		<h1>Login</h1>
+
+		<p>Need to login to input new data into database.</p>
+
+		{{wtf.quick_form(form)}}
+
+	</div>
+</section>
+{% endblock %}

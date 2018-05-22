@@ -52,6 +52,13 @@
             <li class="nav-item">
               <a class="nav-link" href="/About">About</a>
             </li>
+            <li class="nav-item">
+              {% if g.email %}
+                <a class="nav-link" href="/LogOut">Log Out</a>
+              {% else %}
+                <a class="nav-link" href="/Login">Login</a>
+              {% endif %}
+            </li>
           </ul>
         </div>
       </div>

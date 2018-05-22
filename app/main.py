@@ -1,13 +1,13 @@
-from flask import Flask, render_template, url_for, request, flash, redirect
+from flask import Flask, render_template, url_for, request, flash, redirect, session, g
 from flask_bootstrap import Bootstrap
 import os
 from datetime import datetime
 import re
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField,IntegerField, DateTimeField, SelectField
+from wtforms import StringField, SubmitField,IntegerField, DateTimeField, SelectField, PasswordField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.validators import Required
+from wtforms.validators import Required, Length, Email
 from sqlalchemy import func
 from sqlalchemy.sql import label
 import pandas as pd
@@ -17,6 +17,10 @@ app.config['TESTING'] = True
 app.config['SECRET_KEY'] = 'hard to guess string' # Need to use environment variable
 bootstrap = Bootstrap(app)
 app.testing = True
+
+# Login creds, Need to make environment variables
+password = "password"
+username = "claytoncook12@gmail.com"
 
 # Database Setup
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -80,9 +84,14 @@ class PlayerForm(FlaskForm):
 
 class GameForm(FlaskForm):
     date = DateTimeField('Game was played (Format Year-Month-Day Hour:Minute)', format='%Y-%m-%d %H:%M',
-                         validators=[Required()])
+                         validators=[Required("Check Format of Data Time")])
     num_players = IntegerField('Number of players (must be integer): ',validators=[Required()])
     submit = SubmitField('Submit')
+
+class LoginForm(FlaskForm):
+    email = StringField('Email',validators=[Email("This field requires an email address"),Required(), Length(1,64),])
+    password = PasswordField('Password',validators=[Required()])
+    submit = SubmitField('Log In')
 # End Forms Setup
 
 # Functions
@@ -150,6 +159,36 @@ def AC1V1():
 def index():
     return render_template('index.html')
 
+@app.route('/Login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            session.pop('email', None)
+
+            if request.form['password'] == password and request.form['email'] == username: ## Need to update to use environment variable
+                session['email'] = request.form['email']
+                flash('Successfully login in under {}'.format(session['email']))
+                return redirect(url_for('index'))
+            else:
+                flash('Invalid credentials')
+    
+    return render_template('login.html',form=form)
+
+@app.route('/LogOut')
+def logout():
+    session.pop('email',None)
+    return render_template('logOut.html')
+    
+
+# decarator for handling if user logged in
+@app.before_request
+def before_request():
+    g.email = None
+    if 'email' in session:
+        g.email = session['email']
+
 @app.route('/Games/<int:page_num>')
 def games(page_num):
     pagination = db.session.query(Outcome,Player, Game).outerjoin(
@@ -197,29 +236,33 @@ def about():
 def input():
     form = OutcomeForm()
 
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            name = form.player_list.data
-            game = form.game_list.data
-            outcome = form.outcome_input.data
-            pts = form.pts_input.data
+    if g.email:
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                name = form.player_list.data
+                game = form.game_list.data
+                outcome = form.outcome_input.data
+                pts = form.pts_input.data
 
-            form.player_list.data,form.game_list.data,form.outcome_input.data,form.pts_input.data = '','','',''
+                form.player_list.data,form.game_list.data,form.outcome_input.data,form.pts_input.data = '','','',''
 
-            # Find Player and Game in Database
-            findPlayer = Player.query.filter_by(name=name.name).first()
-            findGame = Game.query.filter_by(number=game.number).first()
+                # Find Player and Game in Database
+                findPlayer = Player.query.filter_by(name=name.name).first()
+                findGame = Game.query.filter_by(number=game.number).first()
 
-            # Add to Database
-            findOutcome = Outcome.query.filter_by(player=findPlayer,game=findGame).first()
-            if findOutcome == None:
-                addOutcome = Outcome(outcome=outcome,pts=pts,player=findPlayer, game=findGame)
-                db.session.add(addOutcome)
-                flash('AddedPlayer/Game outcome to database')
-            else:
-                flash('Player/Game outcome already in database')
+                # Add to Database
+                findOutcome = Outcome.query.filter_by(player=findPlayer,game=findGame).first()
+                if findOutcome == None:
+                    addOutcome = Outcome(outcome=outcome,pts=pts,player=findPlayer, game=findGame)
+                    db.session.add(addOutcome)
+                    flash('Added {} to Game {} to database'.format(findPlayer,findGame))
+                else:
+                    flash('Player/Game outcome already in database')
 
-    return render_template('input.html', form=form)
+        return render_template('input.html', form=form)
+    flash('Need to Login to input data.')
+    return redirect(url_for('index'))
+        
 
 @app.route('/Input/Player', methods=['GET', 'POST'])
 def inputPlayer():
