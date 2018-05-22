@@ -67,12 +67,12 @@
     <header class="spacer" style="height: 60px; width: 100%;"></header>
 
     <!-- Messages -->
-    {% with messages = get_flashed_messages() %}
+    {% with messages = get_flashed_messages(with_categories=True) %}
   		{% if messages %}
     		<div class="container">
-	    		<div class="alert alert-warning alert-dismissible" role='alert'>
+	    		<div class="alert {{ messages[0][0] }} alert-dismissible" role='alert'>
 	    		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	    		{% for message in messages %}
+	    		{% for message in messages[0][1:] %}
 	      			{{ message }}
 	    		{% endfor %}
 	    		</div>

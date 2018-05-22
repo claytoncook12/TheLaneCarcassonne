@@ -169,10 +169,10 @@ def login():
 
             if request.form['password'] == password and request.form['email'] == username: ## Need to update to use environment variable
                 session['email'] = request.form['email']
-                flash('Successfully login in under {}'.format(session['email']))
+                flash('Successfully login in under {}'.format(session['email']), category='alert-success')
                 return redirect(url_for('index'))
             else:
-                flash('Invalid credentials')
+                flash('Invalid credentials', category="alert-danger")
     
     return render_template('login.html',form=form)
 
@@ -255,9 +255,9 @@ def input():
                 if findOutcome == None:
                     addOutcome = Outcome(outcome=outcome,pts=pts,player=findPlayer, game=findGame)
                     db.session.add(addOutcome)
-                    flash('Added {} to Game {} to database'.format(findPlayer,findGame))
+                    flash('Added {} to Game {} to database'.format(findPlayer,findGame), category="alert-success")
                 else:
-                    flash('Player/Game outcome already in database')
+                    flash('Player/Game outcome already in database', category="alert-warning")
 
         return render_template('input.html', form=form)
     flash('Need to Login to input data.')
@@ -275,14 +275,14 @@ def inputPlayer():
             form.name.data = ''
 
             if db.session.query(Player).filter_by(name=name).all():
-                flash('Name {} in database. Did not add the name to database.'.format(name))
+                flash('Name {} in database. Did not add the name to database.'.format(name), category="alert-warning")
                 return redirect(url_for('inputPlayer'))
 
             else:
                 # Add name to database
                 addPlayer = Player(name=name)
                 db.session.add(addPlayer)
-                flash('Added player {}.'.format(name))
+                flash('Added player {}.'.format(name), category="alert-success")
                 return redirect(url_for('input'))
 
     return render_template('inputPlayer.html', form=form)
@@ -299,7 +299,7 @@ def inputGame():
             form.date.data,form.num_players.data = '',''
 
             if db.session.query(Game).filter_by(date=date,num_players=num_players).all():
-                flash('Game already in database')
+                flash('Game already in database', category="alert-warning")
             else:
                 # Add new game to database
                 addGame = Game(number=db.session.query(Game).count()+1, \
@@ -307,11 +307,11 @@ def inputGame():
                                game_type='Carcassonne', \
                                num_players=num_players)
                 db.session.add(addGame)
-                flash('Added game on {}.'.format(date.strftime('%Y-%m-%d %H:%M')))
+                flash('Added game on {}.'.format(date.strftime('%Y-%m-%d %H:%M')), category="alert-success")
                 return redirect(url_for('input'))
 
         else:
-            flash('Error when submitting data. Check formating of inputs.')
+            flash('Error when submitting data. Check formating of inputs.', category="alert-warning")
         
     return render_template('inputGame.html', form=form)
 
