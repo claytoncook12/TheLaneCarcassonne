@@ -260,7 +260,7 @@ def input():
                     flash('Player/Game outcome already in database', category="alert-warning")
 
         return render_template('input.html', form=form)
-    flash('Need to Login to input data.')
+    flash('Need to Login to input data.', category="alert-warning")
     return redirect(url_for('index'))
         
 
