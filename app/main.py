@@ -14,13 +14,13 @@ import pandas as pd
 
 app = Flask(__name__)
 app.config['TESTING'] = True
-app.config['SECRET_KEY'] = 'hard to guess string' # Need to use environment variable
+app.config['SECRET_KEY'] = 'hard to guess string' # Need to Use environment variable
 bootstrap = Bootstrap(app)
 app.testing = True
 
-# Login creds, Need to make environment variables
+# Login creds for data input, Make environment variables
 password = "password"
-username = "claytoncook12@gmail.com"
+username = "temp@email.com"
 
 # Database Setup
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -152,7 +152,6 @@ def AC1V1():
     outcomeOnly.insert(0,['Outcome', 'Points', 'Name', 'Game Number', 'Date', 'Number of Players'])
 
     return outcomeOnly
-
 # Functions End
 
 @app.route('/')
