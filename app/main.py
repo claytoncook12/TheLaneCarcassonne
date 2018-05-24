@@ -92,6 +92,10 @@ class LoginForm(FlaskForm):
     email = StringField('Email',validators=[Email("This field requires an email address"),Required(), Length(1,64),])
     password = PasswordField('Password',validators=[Required()])
     submit = SubmitField('Log In')
+
+class PlayerLookup(FlaskForm):
+    player_list = QuerySelectField('Name of Player:',query_factory=player_query, allow_blank=True)
+    submit = SubmitField('Lookup')
 # End Forms Setup
 
 # Functions
@@ -152,6 +156,96 @@ def AC1V1():
     outcomeOnly.insert(0,['Outcome', 'Points', 'Name', 'Game Number', 'Date', 'Number of Players'])
 
     return outcomeOnly
+
+def AllStats():
+    """All Game Stats pulled form the database"""
+
+    allStats = db.session.query(Outcome.outcome,Outcome.pts,Player.name,Game.number,Game.date,Game.num_players).outerjoin(
+            Player, Outcome.player_id == Player.id).outerjoin(
+                Game, Outcome.games_id == Game.id).all()
+
+    allStats.insert(0,['Outcome', 'Points', 'Name', 'Game Number', 'Date', 'Number of Players'])
+
+    dataframe = pd.DataFrame(allStats[1:], columns=allStats[0])
+
+    # Calculated All Game Stats
+    totalGames = len(dataframe['Game Number'].unique())
+    totalPlayers = len(dataframe['Name'].unique())
+
+    # Calculated Max Points Per Number of Players
+    maxPtsNum = dataframe.sort_values('Points', ascending=False).\
+                drop_duplicates(['Number of Players']).sort_values('Number of Players', ascending=False)
+    twoPlayers = maxPtsNum[maxPtsNum['Number of Players'] == 2]
+    threePlayers = maxPtsNum[maxPtsNum['Number of Players'] == 3]
+    fourPlayers = maxPtsNum[maxPtsNum['Number of Players'] == 4]
+    fivePlayers = maxPtsNum[maxPtsNum['Number of Players'] == 5]
+
+    return {'totalGames': totalGames,
+            'totalPlayers': totalPlayers,
+            'maxPtsNum': maxPtsNum,
+            'twoPlayers': twoPlayers['Name'].item() + ", " +
+                           str(twoPlayers['Points'].item()) + " points on " +
+                           (twoPlayers['Date'].dt.strftime('%Y/%m/%d').item()),
+            'threePlayers': threePlayers['Name'].item() + ", " +
+                           str(threePlayers['Points'].item()) + " points on " +
+                           (threePlayers['Date'].dt.strftime('%Y/%m/%d').item()),
+            'fourPlayers': fourPlayers['Name'].item() + ", " +
+                           str(fourPlayers['Points'].item()) + " points on " +
+                           (fourPlayers['Date'].dt.strftime('%Y/%m/%d').item()),
+            'fivePlayers': fivePlayers['Name'].item() + ", " +
+                           str(fivePlayers['Points'].item()) + " points on " +
+                           (fivePlayers['Date'].dt.strftime('%Y/%m/%d').item())}
+
+def IndStats(name):
+    """Individual Player Stats"""
+
+    allStats = db.session.query(Outcome.outcome,Outcome.pts,Player.name,Game.number,Game.date,Game.num_players).outerjoin(
+            Player, Outcome.player_id == Player.id).outerjoin(
+                Game, Outcome.games_id == Game.id).all()
+
+    allStats.insert(0,['Outcome', 'Points', 'Name', 'Game Number', 'Date', 'Number of Players'])
+
+    dataframe = pd.DataFrame(allStats[1:], columns=allStats[0])
+
+    # Player Win % Dataframe
+    dfPlayer = dataframe.groupby(['Name','Outcome']).size().unstack()
+    dfPlayer.fillna(0, inplace=True) # Replaces NaN values
+    dfPlayer['Games'] = dfPlayer['Lose'] + dfPlayer['Tie'] + dfPlayer['Win']
+    dfPlayer['Win %'] = dfPlayer['Win'] / dfPlayer['Games']
+    games = dfPlayer.loc[(name)]['Games']
+    wins = dfPlayer.loc[(name)]['Win']
+    losses = dfPlayer.loc[(name)]['Lose']
+    ties = dfPlayer.loc[(name)]['Win %']
+    winPer = '%.4g'%(dfPlayer.loc[(name)]['Win %'] * 100)
+
+    # Player Max Points in Different Number of Player Games
+    dfMaxPoints = dataframe.sort_values('Points', ascending=False).\
+                drop_duplicates(['Name','Number of Players']).sort_values('Number of Players', ascending=False)
+
+    def gameValues(df, name, numPlayers):
+        data = df[(df['Name'] == name) & (df['Number of Players'] == numPlayers)]
+        
+        if data.empty == True:
+            return "NaN"
+        else:
+            return data['Name'].item() + ", " + str(data['Points'].item()) + " points on " +(data['Date'].dt.strftime('%Y/%m/%d').item())
+    
+    twoPly = gameValues(dfMaxPoints, name, 2)
+    threePly = gameValues(dfMaxPoints, name, 3)
+    fourPly = gameValues(dfMaxPoints, name, 4)
+    fivePly = gameValues(dfMaxPoints, name, 5)
+
+    return {'name': name,
+            'games': games,
+            'wins': wins,
+            'losses': losses,
+            'ties': ties,
+            'winPer': winPer,
+            'twoPly': twoPly,
+            'threePly': threePly,
+            'fourPly': fourPly,
+            'fivePly': fivePly}
+    
 # Functions End
 
 @app.route('/')
@@ -199,6 +293,29 @@ def games(page_num):
                         page=page_num,per_page=20,error_out=False)
     
     return render_template('games.html', pagination=pagination)
+
+@app.route('/Stats', methods=['GET', 'POST'])
+def stats():
+    form = PlayerLookup()
+    dataAll = AllStats()
+    dataInd = {'name': "",
+            'games': "",
+            'wins': "",
+            'losses': "",
+            'ties': "",
+            'winPer': "",
+            'twoPly': "",
+            'threePly': "",
+            'fourPly': "",
+            'fivePly': ""}
+    
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            dataInd = IndStats(str(form.player_list.data))
+            #dataInd['name'] = str(form.player_list.data)
+            return render_template('stats.html', form=form, dataAll=dataAll, dataInd=dataInd)
+
+    return render_template('stats.html', form=form, dataAll=dataAll, dataInd=dataInd) 
 
 @app.route('/Rivalries')
 def rivalries():

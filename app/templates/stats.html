@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block header %}
+
+{% endblock %}
+
+{% block page_content %}
+  <section class="py-5">
+    <div class="container">
+      	<h2>Overall Stats</h2>
+
+      	<table class="table">
+			<tbody>
+		    	<tr>
+		    		<td scope="row">Total Games Played</td>
+		    		<td>{{ dataAll['totalGames']}}</td>
+	    		</tr>
+	    		<tr>
+		    		<td scope="row">Number of Players</td>
+		    		<td>{{ dataAll['totalPlayers']}}</td>
+		    	<tr>
+		    	</tr>
+		    		<td scope="row">2 Players Max Points</td>
+		    		<td>{{ dataAll['twoPlayers'] }}</td>
+		    	</tr>
+		    	</tr>
+		    		<td scope="row">3 Players Max Points</td>
+		    		<td>{{ dataAll['threePlayers'] }}</td>
+		    	</tr>
+		    	</tr>
+		    		<td scope="row">4 Players Max Points</td>
+		    		<td>{{ dataAll['fourPlayers'] }}</td>
+		    	</tr>
+		    	</tr>
+		    		<td scope="row">5 Players Max Points</td>
+		    		<td>{{ dataAll['fivePlayers'] }}</td>
+		    	</tr>
+		    </tbody>
+		</table>
+      		
+      	<h2>Player Stats Lookup</h2>
+      		{{wtf.quick_form(form)}}
+
+      	<br>
+
+      	<table class="table">
+			<tbody>
+		    	<tr>
+		    		<td scope="row">Player</td>
+		    		<td>{{ dataInd['name'] }}</td>
+		    	<tr>
+		    		<td scope="row">Total Games Played</td>
+		    		<td>{{ dataInd['games'] }}</td>
+	    		</tr>
+	    		<tr>
+		    		<td scope="row">Win %</td>
+		    		<td>{{ dataInd['winPer']}}</td>
+	    		</tr>
+		    	</tr>
+		    		<td scope="row">2 Players Max Points</td>
+		    		<td>{{ dataInd['twoPly'] }}</td>
+		    	</tr>
+		    	</tr>
+		    		<td scope="row">3 Players Max Points</td>
+		    		<td>{{ dataInd['threePly'] }}</td>
+		    	</tr>
+		    	</tr>
+		    		<td scope="row">4 Players Max Points</td>
+		    		<td>{{ dataInd['fourPly'] }}</td>
+		    	</tr>
+		    	</tr>
+		    		<td scope="row">5 Players Max Points</td>
+		    		<td>{{ dataInd['fivePly'] }}</td>
+		    	</tr>
+		    </tbody>
+		</table>
+
+    </div>
+  </section>
+{% endblock %}
