@@ -343,11 +343,6 @@ def rivalries():
     
     return render_template('rivalries.html', results=results, stats1v1=stats1v1)
 
-@app.route('/About')
-def about():
-    return render_template('about.html')
-
-
 @app.route('/Input', methods=['GET', 'POST'])
 def input():
     form = OutcomeForm()
